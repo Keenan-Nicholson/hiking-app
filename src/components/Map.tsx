@@ -23,6 +23,36 @@ export const Map = () => {
       center: [lng, lat],
       zoom: zoom,
     });
+
+    map.current.on("style.load", async () => {
+      try {
+        let response = await fetch("./public/tracks.geojson");
+        console.log(response);
+        let geoJSONcontent = await response.json();
+        console.log(geoJSONcontent);
+
+        map.current!.addSource("my-source", {
+          type: "geojson",
+          data: geoJSONcontent,
+        });
+
+        map.current!.addLayer({
+          id: "track",
+          type: "line",
+          source: "my-source",
+          layout: {
+            "line-join": "round",
+            "line-cap": "round",
+          },
+          paint: {
+            "line-width": 2,
+            "line-color": "#FF0000",
+          },
+        });
+      } catch (error) {
+        console.error("Error loading geoJSON content:", error);
+      }
+    });
   });
 
   return (
