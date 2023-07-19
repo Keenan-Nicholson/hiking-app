@@ -13,14 +13,17 @@ from pydantic import PostgresDsn, BaseSettings
 
 import uvicorn
 
+
 class Settings(BaseSettings):
-    pg_dsn: PostgresDsn = 'postgres://postgres:password@localhost:5432/postgres'
+    pg_dsn: PostgresDsn = "postgresql://postgres:password@127.0.0.1:5432/postgres"
 
     class Config:
-        env_file = '.env'
-        env_file_encoding = 'utf-8'
+        env_file = ".env"
+        env_file_encoding = "utf-8"
+
 
 settings = Settings()
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -36,7 +39,7 @@ async def lifespan(app: FastAPI):
         settings=PostgresSettings(database_url=settings.pg_dsn),
         schemas=["public"],
     )
-    await register_collection_catalog(app, schemas=["public"])
+    await register_collection_catalog(app, tables=["public"])
 
     yield
 
