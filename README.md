@@ -21,7 +21,7 @@ npm install
 ### Create a .env file in the root directory and add the following variables
 
 ```sh
-DATABASE_URL = your_database_url
+PG_DSN = your_database_url
 ```
 
 ### Create a .env in the frontend directory and add the following variables
