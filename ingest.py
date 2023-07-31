@@ -9,6 +9,25 @@ from sqlalchemy import Column, Integer, String
 from geoalchemy2 import Geometry
 from sqlalchemy.orm import sessionmaker
 from geoalchemy2.shape import from_shape
+from app import settings
+
+Base = declarative_base()
+
+
+class Tracks(Base):
+    __tablename__ = "tracks"
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    time = Column(String)
+    geometry = Column(Geometry("LINESTRING", srid=4326))
+
+
+engine = create_engine(settings.pg_dsn, echo=True)
+
+if not sqlalchemy.inspect(engine).has_table("tracks"):
+    Tracks.__table__.create(engine)
+
+Session = sessionmaker(bind=engine)
 
 
 def ingest_gpx_from_path_to_db(dir):
@@ -54,27 +73,11 @@ def ingest_gpx_from_path_to_db(dir):
     for gdf in gpx_gdfs:
         gdf["geometry"] = gdf["geometry"].apply(lambda x: from_shape(x, srid=4326))
 
-    Base = declarative_base()
-
-    class Tracks(Base):
-        __tablename__ = "tracks"
-        id = Column(Integer, primary_key=True)
-        name = Column(String)
-        time = Column(String)
-        geometry = Column(Geometry("LINESTRING", srid=4326))
-
-    engine = create_engine(
-        "postgresql://postgres:password@127.0.0.1:5432/postgres", echo=True
-    )
-
-    if not sqlalchemy.inspect(engine).has_table("tracks"):
-        Tracks.__table__.create(engine)
-
-    Session = sessionmaker(bind=engine)
     session = Session()
 
     for gdf in gpx_gdfs:
         for index, row in gdf.iterrows():
+            print(row["geometry"])
             track = Tracks(name=row["name"], time=row["time"], geometry=row["geometry"])
             session.add(track)
 

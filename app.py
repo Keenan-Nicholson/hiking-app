@@ -7,15 +7,13 @@ from tipg.settings import PostgresSettings
 
 from fastapi import FastAPI
 
-from typing import Any, Callable, Set
-
-from pydantic import PostgresDsn, BaseSettings
+from pydantic import BaseSettings
 
 import uvicorn
 
 
 class Settings(BaseSettings):
-    pg_dsn: PostgresDsn = "postgresql://postgres:password@127.0.0.1:5432/postgres"
+    pg_dsn: str = "postgresql://postgres:password@127.0.0.1:5432/postgres"
 
     class Config:
         env_file = ".env"
@@ -39,7 +37,7 @@ async def lifespan(app: FastAPI):
         settings=PostgresSettings(database_url=settings.pg_dsn),
         schemas=["public"],
     )
-    await register_collection_catalog(app, tables=["public"])
+    await register_collection_catalog(app, schemas=["public"])
 
     yield
 
@@ -54,4 +52,4 @@ app.include_router(endpoints.router, tags=["OGC Features API"])
 add_exception_handlers(app, DEFAULT_STATUS_CODES)
 
 if __name__ == "__main__":
-    uvicorn.run("app:app", host="127.0.0.1", port=8000, log_level="info")
+    uvicorn.run("app:app", host="127.0.0.1", port=8080, log_level="info")

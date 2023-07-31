@@ -36,9 +36,9 @@ VITE_MAP_TILER_API_KEY = your_map_tiler_api_key
 docker compose up -d
 ```
 
-### Run TiPG
+### Run TiPg
 
 ```sh
 DATABASE_URL=postgresql://username:password@0.0.0.0:5432/postgis
-uvicorn tipg.main:app
+uvicorn app:app
 ```
