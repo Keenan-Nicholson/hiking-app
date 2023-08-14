@@ -6,7 +6,7 @@ import "./root.css";
 const API_KEY = import.meta.env.VITE_MAP_TILER_API_KEY;
 
 const GEOJSON_URL =
-  "http://127.0.0.1:8000/collections/public.tracks/items?f=geojson";
+  "https://hiking-app.fly.dev/collections/public.tracks/items?f=geojson";
 
 export const Map = () => {
   const mapContainer = useRef(null);
@@ -25,6 +25,7 @@ export const Map = () => {
     });
 
     map.current.on("load", () => {
+      console.log("loading geojson url");
       map.current?.addSource("tracks", {
         type: "geojson",
         data: GEOJSON_URL,
