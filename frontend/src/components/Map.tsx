@@ -3,8 +3,6 @@ import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./root.css";
 
-const API_KEY = import.meta.env.VITE_MAP_TILER_API_KEY;
-
 const GEOJSON_URL =
   "https://hiking-app.fly.dev/collections/public.tracks/items?f=geojson";
 
@@ -19,7 +17,7 @@ export const Map = () => {
     }
     map.current = new maplibregl.Map({
       container: mapContainer.current,
-      style: `https://api.maptiler.com/maps/outdoor-v2/style.json?key=${API_KEY}`,
+      style: `https://api.maptiler.com/maps/outdoor-v2/style.json?key=He3M1IBox770FUgb0GkI`,
       center: [-56.3851, 48.9793],
       zoom: 5.6,
     });
