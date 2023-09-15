@@ -5,9 +5,9 @@ import "./root.css";
 
 const GEOJSON_URL =
   // production
-  // "https://hiking-app.fly.dev/collections/public.tracks/items?f=geojson";
-  //local development
-  "http://localhost:8000/collections/public.tracks/items?f=geojson";
+  "https://hiking-app.fly.dev/collections/public.tracks/items?f=geojson";
+//local development
+// "http://localhost:8000/collections/public.tracks/items?f=geojson";
 
 export const Map = () => {
   const mapContainer = useRef(null);
