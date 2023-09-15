@@ -4,7 +4,10 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import "./root.css";
 
 const GEOJSON_URL =
-  "https://hiking-app.fly.dev/collections/public.tracks/items?f=geojson";
+  // production
+  // "https://hiking-app.fly.dev/collections/public.tracks/items?f=geojson";
+  //local development
+  "http://localhost:8000/collections/public.tracks/items?f=geojson";
 
 export const Map = () => {
   const mapContainer = useRef(null);
@@ -23,7 +26,6 @@ export const Map = () => {
     });
 
     map.current.on("load", () => {
-      console.log("loading geojson url");
       map.current?.addSource("tracks", {
         type: "geojson",
         data: GEOJSON_URL,
