@@ -2,32 +2,9 @@ import geopandas as gpd
 import gpxpy
 import glob
 from shapely.geometry import LineString
-from sqlalchemy import create_engine
-import sqlalchemy
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String
-from geoalchemy2 import Geometry
-from sqlalchemy.orm import sessionmaker
 from geoalchemy2.shape import from_shape
-from app import settings
-
-Base = declarative_base()
-
-
-class Tracks(Base):
-    __tablename__ = "tracks"
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    time = Column(String)
-    geometry = Column(Geometry("LINESTRING", srid=4326))
-
-
-engine = create_engine(settings.pg_dsn, echo=True)
-
-if not sqlalchemy.inspect(engine).has_table("tracks"):
-    Tracks.__table__.create(engine)
-
-Session = sessionmaker(bind=engine)
+from db import Session, Tracks, Users
+import bcrypt
 
 
 def ingest_gpx_from_path_to_db(dir):
@@ -81,4 +58,17 @@ def ingest_gpx_from_path_to_db(dir):
             track = Tracks(name=row["name"], time=row["time"], geometry=row["geometry"])
             session.add(track)
 
+    session.commit()
+
+
+def create_user(username, password, email, first_name, last_name):
+    session = Session()
+    user = Users(
+        username=username,
+        password_hash=bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()),
+        email=email,
+        first_name=first_name,
+        last_name=last_name,
+    )
+    session.add(user)
     session.commit()
