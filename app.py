@@ -66,16 +66,12 @@ def authenticate_user(username: str, password: str, db: Session):
     return True
 
 
-app = FastAPI(openapi_url="/api", docs_url="/api.html", lifespan=lifespan)
-
-
 class SessionData(BaseModel):
     username: str
 
 
 cookie_params = CookieParameters()
 
-# Uses UUID
 cookie = SessionCookie(
     cookie_name="cookie",
     identifier="general_verifier",
@@ -86,9 +82,55 @@ cookie = SessionCookie(
 backend = InMemoryBackend[UUID, SessionData]()
 
 
+class BasicVerifier(SessionVerifier[UUID, SessionData]):
+    def __init__(
+        self,
+        *,
+        identifier: str,
+        auto_error: bool,
+        backend: InMemoryBackend[UUID, SessionData],
+        auth_http_exception: HTTPException,
+    ):
+        self._identifier = identifier
+        self._auto_error = auto_error
+        self._backend = backend
+        self._auth_http_exception = auth_http_exception
+
+    @property
+    def identifier(self):
+        return self._identifier
+
+    @property
+    def backend(self):
+        return self._backend
+
+    @property
+    def auto_error(self):
+        return self._auto_error
+
+    @property
+    def auth_http_exception(self):
+        return self._auth_http_exception
+
+    def verify_session(self, model: SessionData) -> bool:
+        """If the session exists, it is valid"""
+        return True
+
+
+verifier = BasicVerifier(
+    identifier="general_verifier",
+    auto_error=True,
+    backend=backend,
+    auth_http_exception=HTTPException(status_code=403, detail="invalid session"),
+)
+
+
 class LoginBody(BaseModel):
     username: str
     password: str
+
+
+app = FastAPI(openapi_url="/api", docs_url="/api.html", lifespan=lifespan)
 
 
 @app.post("/login/")
@@ -109,13 +151,17 @@ async def login_user(
     await backend.create(session, data)
     cookie.attach_to_response(response, session)
 
-    return f"created session for {user}"
+    return f"created session for {user.username}"
+
+
+@app.get("/whoami", dependencies=[Depends(cookie)])
+async def whoami(session_data: SessionData = Depends(verifier)):
+    return session_data
 
 
 origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    "https://keenannicholson.me",
     "https://www.trekspot.club",
 ]
 
