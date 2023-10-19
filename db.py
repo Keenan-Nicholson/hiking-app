@@ -1,11 +1,19 @@
 from sqlalchemy import TIMESTAMP, create_engine, func
-import sqlalchemy
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.dialects.postgresql import BYTEA
 from geoalchemy2 import Geometry
 from sqlalchemy.orm import sessionmaker
-from app import settings
+from app_settings import settings
+
+
+def get_db():
+    db = Session()
+    try:
+        yield db
+    finally:
+        db.close()
+
 
 Base = declarative_base()
 
