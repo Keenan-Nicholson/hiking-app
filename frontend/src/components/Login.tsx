@@ -1,7 +1,10 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
 async function postCredentials(username: string, password: string) {
   try {
     const response = await fetch("http://127.0.0.1:8080/login", {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
@@ -19,6 +22,22 @@ async function postCredentials(username: string, password: string) {
 }
 
 export const Login = () => {
+  const queryClient = useQueryClient();
+
+  const { mutate } = useMutation({
+    mutationFn: ({
+      username,
+      password,
+    }: {
+      username: string;
+      password: string;
+    }) => postCredentials(username, password),
+    onSuccess: () => {
+      console.log("Success");
+      queryClient.invalidateQueries(["whoami"]);
+    },
+  });
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const { target } = event;
@@ -29,8 +48,8 @@ export const Login = () => {
         .filter((el) => !el.name.includes("remember"))
         .map((el) => [el.name, el.value])
     );
-    console.log(formData);
-    postCredentials(formData.username, formData.password);
+
+    mutate({ username: formData.username, password: formData.password });
   };
 
   return (

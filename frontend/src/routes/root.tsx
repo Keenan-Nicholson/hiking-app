@@ -1,14 +1,12 @@
 import { NavBar } from "../components/NavBar";
 import "../components/root.css";
-import { Map } from "../components/Map";
+import { Outlet } from "react-router-dom";
 
 export default function Root() {
   return (
-    <div>
-      <div className="Map">
-        <NavBar />
-        <Map />
-      </div>
+    <div className="Map">
+      <NavBar />
+      <Outlet />
     </div>
   );
 }

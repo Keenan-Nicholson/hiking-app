@@ -5,26 +5,37 @@ import "./index.css";
 import Root from "./routes/root";
 import Login from "./routes/login";
 import CreateAccountPage from "./routes/create-account";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Map } from "./components/Map";
 const router = createBrowserRouter(
   [
     {
-      path: "/",
       element: <Root />,
-    },
-    {
-      path: "/login",
-      element: <Login />,
-    },
-    {
-      path: "/create-account",
-      element: <CreateAccountPage />,
+      children: [
+        {
+          path: "/",
+          element: <Map />,
+        },
+        {
+          path: "/login",
+          element: <Login />,
+        },
+        {
+          path: "/create-account",
+          element: <CreateAccountPage />,
+        },
+      ],
     },
   ],
   { basename: import.meta.env.BASE_URL }
 );
 
+const queryClient = new QueryClient();
+
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
   </React.StrictMode>
 );
