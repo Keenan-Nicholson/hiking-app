@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+import os
 import bcrypt
 from tipg.database import close_db_connection, connect_to_db
 from tipg.collections import register_collection_catalog
@@ -25,6 +26,12 @@ from fastapi_sessions.session_verifier import SessionVerifier
 from fastapi_sessions.frontends.implementations import SessionCookie, CookieParameters
 
 from app_settings import settings
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+COOKIE_SECRET = os.getenv("COOKIE_SECRET")
 
 
 @asynccontextmanager
@@ -76,7 +83,7 @@ cookie = SessionCookie(
     cookie_name="cookie",
     identifier="general_verifier",
     auto_error=True,
-    secret_key="secret",
+    secret_key=COOKIE_SECRET,
     cookie_params=cookie_params,
 )
 backend = InMemoryBackend[UUID, SessionData]()

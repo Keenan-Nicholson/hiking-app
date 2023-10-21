@@ -7,13 +7,9 @@ export const NavBar = () => {
       const resp = await fetch("http://127.0.0.1:8080/whoami", {
         credentials: "include",
       });
-      console.log({ resp });
       return resp.json();
     },
   });
-
-  console.log({ data });
-
   const username = data?.username;
 
   return (
