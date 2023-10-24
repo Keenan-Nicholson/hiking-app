@@ -28,6 +28,7 @@ from fastapi_sessions.frontends.implementations import SessionCookie, CookiePara
 from app_settings import settings
 
 from dotenv import load_dotenv
+from ingest import create_user
 
 load_dotenv()
 
@@ -137,6 +138,14 @@ class LoginBody(BaseModel):
     password: str
 
 
+class CreateAccountBody(BaseModel):
+    firstname: str
+    lastname: str
+    username: str
+    password: str
+    email: str
+
+
 app = FastAPI(openapi_url="/api", docs_url="/api.html", lifespan=lifespan)
 
 
@@ -159,6 +168,28 @@ async def login_user(
     cookie.attach_to_response(response, session)
 
     return f"created session for {user.username}"
+
+
+# TODO: email already in use error
+@app.post("/create-account/")
+async def create_account(
+    account: CreateAccountBody,
+    db: Session = Depends(get_db),
+):
+    user = get_user_from_database(account.username, db)
+
+    if user:
+        raise HTTPException(status_code=400, detail="User already exists")
+
+    create_user(
+        account.username,
+        account.password,
+        account.email,
+        account.firstname,
+        account.lastname,
+    )
+
+    return f"created user {account.username}"
 
 
 @app.get("/whoami", dependencies=[Depends(cookie)])

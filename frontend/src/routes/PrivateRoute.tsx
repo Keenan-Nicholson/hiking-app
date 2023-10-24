@@ -9,16 +9,13 @@ export const PrivateRoute = () => {
         method: "GET",
         credentials: "include",
       });
-      console.log({ response });
       const result = await response.json();
       return result;
     },
   });
 
-  console.log(isLoading);
   const isLoggedIn = whoami?.username;
 
-  // TODO: fix loading spinner not showing up
   if (isLoading) {
     return (
       <div

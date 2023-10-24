@@ -1,4 +1,75 @@
+import { useMutation } from "@tanstack/react-query";
+
 export const CreateAccount = () => {
+  async function postAccountDetails(
+    firstname: string,
+    lastname: string,
+    username: string,
+    password: string,
+    email: string
+  ) {
+    try {
+      const response = await fetch("http://127.0.0.1:8080/create-account", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstname,
+          lastname,
+          username,
+          password,
+          email,
+        }),
+      });
+
+      const result = await response.json();
+      console.log("Success:", result);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
+
+  const { mutate } = useMutation({
+    mutationFn: ({
+      firstname,
+      lastname,
+      username,
+      password,
+      email,
+    }: {
+      firstname: string;
+      lastname: string;
+      username: string;
+      password: string;
+      email: string;
+    }) => postAccountDetails(firstname, lastname, username, password, email),
+    onSuccess: () => {
+      console.log("Success");
+    },
+  });
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const { target } = event;
+    const inputs = [...(target as unknown as HTMLInputElement[])];
+    const formData = Object.fromEntries(
+      inputs
+        .filter((el) => el.name.length)
+        .filter((el) => !el.name.includes("remember"))
+        .map((el) => [el.name, el.value])
+    );
+
+    mutate({
+      firstname: formData.firstname,
+      lastname: formData.lastname,
+      username: formData.username,
+      password: formData.password,
+      email: formData.email,
+    });
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 shadow-2xl p-5 rounded-lg">
@@ -7,32 +78,32 @@ export const CreateAccount = () => {
             Create an account
           </h2>
         </div>
-        <form className="mt-8 space-y-6" action="#" method="POST">
+        <form className="mt-8 space-y-6" action="#" onSubmit={handleSubmit}>
           <input type="hidden" name="remember" defaultValue="true" />
           <div>
             <div>
-              <label htmlFor="first-name" className="sr-only">
+              <label htmlFor="firstname" className="sr-only">
                 firstname
               </label>
               <input
-                id="first-name"
-                name="first-name"
-                type="first-name"
-                autoComplete="first-name"
+                id="firstname"
+                name="firstname"
+                type="firstname"
+                autoComplete="firstname"
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="First name"
               />
             </div>
             <div>
-              <label htmlFor="last-name" className="sr-only">
+              <label htmlFor="lastname" className="sr-only">
                 lastname
               </label>
               <input
-                id="last-name"
-                name="last-name"
-                type="last-name"
-                autoComplete="last-name"
+                id="lastname"
+                name="lastname"
+                type="lastname"
+                autoComplete="lastname"
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Last name"
@@ -53,7 +124,7 @@ export const CreateAccount = () => {
               />
             </div>
             <div>
-              <label htmlFor="email-address" className="sr-only">
+              <label htmlFor="emailaddress" className="sr-only">
                 Email address
               </label>
               <input
@@ -76,22 +147,8 @@ export const CreateAccount = () => {
                 type="password"
                 autoComplete="current-password"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
-              />
-            </div>
-            <div>
-              <label htmlFor="re-enter-password" className="sr-only">
-                Password
-              </label>
-              <input
-                id="re-enter-password"
-                name="re-enter-password"
-                type="re-enter-password"
-                autoComplete="current-password"
-                required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Re-enter password"
+                placeholder="Password"
               />
             </div>
           </div>

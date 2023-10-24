@@ -7,7 +7,7 @@ import Login from "./routes/login";
 import CreateAccountPage from "./routes/create-account";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Map } from "./components/Map";
-import { PrivateRoute } from "./components/PrivateRoute";
+import { PrivateRoute } from "./routes/PrivateRoute";
 
 const router = createBrowserRouter(
   [
