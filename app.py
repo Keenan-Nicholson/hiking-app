@@ -29,6 +29,7 @@ from app_settings import settings
 
 from dotenv import load_dotenv
 from ingest import create_user
+from ingest import ingest_gpx_from_path_to_db
 
 load_dotenv()
 
@@ -190,6 +191,16 @@ async def create_account(
     )
 
     return f"created user {account.username}"
+
+
+@app.post("/upload_gpx/")
+async def upload_gpx(
+    gpx_dir: str,
+    db: Session = Depends(get_db),
+):
+    ingest_gpx_from_path_to_db(gpx_dir)
+
+    return f"ingested gpx files from {gpx_dir}"
 
 
 @app.get("/whoami", dependencies=[Depends(cookie)])
