@@ -147,6 +147,10 @@ class CreateAccountBody(BaseModel):
     email: str
 
 
+class uploadGPXbody(BaseModel):
+    dir: str
+
+
 app = FastAPI(openapi_url="/api", docs_url="/api.html", lifespan=lifespan)
 
 
@@ -193,14 +197,13 @@ async def create_account(
     return f"created user {account.username}"
 
 
-@app.post("/upload_gpx/")
+@app.post("/upload-gpx/")
 async def upload_gpx(
-    gpx_dir: str,
-    db: Session = Depends(get_db),
+    dir: uploadGPXbody,
 ):
-    ingest_gpx_from_path_to_db(gpx_dir)
+    ingest_gpx_from_path_to_db(dir)
 
-    return f"ingested gpx files from {gpx_dir}"
+    return f"ingested gpx files from {dir}"
 
 
 @app.get("/whoami", dependencies=[Depends(cookie)])
